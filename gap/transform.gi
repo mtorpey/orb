@@ -181,27 +181,6 @@ else
       end );
 fi;
 
-if IsBound(IS_INJECTIVE_TRANS_ON_LIST) then
-  InstallGlobalFunction( "IsInjectiveTransOnList",
-                         IS_INJECTIVE_TRANS_ON_LIST );
-else
-    InstallGlobalFunction( "IsInjectiveTransOnList",
-      function( t, l )
-        local i,li,n,tab;
-        if IsTransformation(t) then li := t![1]; else li := t; fi;
-        n := Length(l);
-        tab := EmptyPlist(n);
-        for i in l do
-            if IsBound(tab[li[i]]) then
-                return false;
-            else
-                tab[li[i]] := 1;
-            fi;
-        od;
-        return true;
-      end );
-fi;
-
 ##
 ##  This program is free software: you can redistribute it and/or modify
 ##  it under the terms of the GNU General Public License as published by
