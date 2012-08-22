@@ -14,8 +14,6 @@
 #############################################################################
 
 DeclareGlobalFunction( "ImageAndKernelOfTransformation" );
-DeclareOperation( "PermLeftQuoTransformationNC", 
-  [ IsTransformation, IsTransformation ]);
 DeclareGlobalFunction( "MappingPermSetSet" );
 DeclareGlobalFunction( "CanonicalTransSameKernel" );
 DeclareGlobalFunction( "IsInjectiveTransOnList" );
