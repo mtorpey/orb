@@ -16,7 +16,6 @@
 DeclareGlobalFunction( "ImageAndKernelOfTransformation" );
 DeclareGlobalFunction( "MappingPermSetSet" );
 DeclareGlobalFunction( "CanonicalTransSameKernel" );
-DeclareGlobalFunction( "IsInjectiveTransOnList" );
 
 ##
 ##  This program is free software: you can redistribute it and/or modify
