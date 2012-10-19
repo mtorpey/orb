@@ -780,7 +780,7 @@ fi;
 
 InstallGlobalFunction( ORB_HashFunctionForTransformations,
 function(t,data)
-  return ORB_HashFunctionForPlainFlatList(t![1],data);
+  return HashKeyBag(f,255,0,2*DEGREE_TRANS(f) mod data +1;
 end );
 
 InstallGlobalFunction( MakeHashFunctionForPlainFlatList,
@@ -801,7 +801,7 @@ InstallMethod( ChooseHashFunction, "for permutations",
   end );
 
 InstallMethod( ChooseHashFunction, "for transformations",
-  [IsTransformationRep, IsInt],
+  [IsTransformation, IsInt],
   function(t,hashlen)
     return rec( func := ORB_HashFunctionForTransformations, data := hashlen );
   end );
