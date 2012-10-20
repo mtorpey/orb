@@ -780,7 +780,7 @@ fi;
 
 InstallGlobalFunction( ORB_HashFunctionForTransformations,
 function(t,data)
-  return HashKeyBag(f,255,0,2*DEGREE_TRANS(f) mod data +1;
+  return HashKeyBag(t,255,6,2*DegreeOfTransformation(t)) mod data + 1;
 end );
 
 InstallGlobalFunction( MakeHashFunctionForPlainFlatList,
