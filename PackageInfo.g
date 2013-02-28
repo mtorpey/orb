@@ -17,7 +17,7 @@ PackageName := "orb",
 
 Subtitle := "orb - Methods to enumerate Orbits",
 
-Version := "4.5",
+Version := "5.0",
 ##  Please adjust also the VERSION file in the package directory when
 ##  changing this.
 
