@@ -311,6 +311,7 @@ static inline Int AVLIndex( Obj t, Int i )
 
 static Obj AVLIndex_C( Obj self, Obj t, Obj i )
 {
+    Int p;
     if (!IS_INTOBJ(i) || 
         TNUM_OBJ(t) != T_POSOBJ ||
         (TYPE_POSOBJ(t) != AVLTreeType &&
@@ -318,7 +319,7 @@ static Obj AVLIndex_C( Obj self, Obj t, Obj i )
         ErrorQuit( "Usage: AVLIndex(avltree, integer)", 0L, 0L );
         return 0L;
     }
-    Int p = AVLIndex( t, INT_INTOBJ(i) );
+    p = AVLIndex( t, INT_INTOBJ(i) );
     if (p == 0) 
         return Fail;
     else
@@ -327,6 +328,7 @@ static Obj AVLIndex_C( Obj self, Obj t, Obj i )
 
 static Obj AVLIndexFind_C( Obj self, Obj t, Obj i )
 {
+    Int p;
     if (!IS_INTOBJ(i) || 
         TNUM_OBJ(t) != T_POSOBJ ||
         (TYPE_POSOBJ(t) != AVLTreeType &&
@@ -334,7 +336,7 @@ static Obj AVLIndexFind_C( Obj self, Obj t, Obj i )
         ErrorQuit( "Usage: AVLIndexFind(avltree, integer)", 0L, 0L );
         return 0L;
     }
-    Int p = AVLIndex( t, INT_INTOBJ(i) );
+    p = AVLIndex( t, INT_INTOBJ(i) );
     if (p == 0) 
         return Fail;
     else
@@ -343,6 +345,8 @@ static Obj AVLIndexFind_C( Obj self, Obj t, Obj i )
 
 static Obj AVLIndexLookup_C( Obj self, Obj t, Obj i )
 {
+    Int p;
+    Obj vals;
     if (!IS_INTOBJ(i) || 
         TNUM_OBJ(t) != T_POSOBJ ||
         (TYPE_POSOBJ(t) != AVLTreeType &&
@@ -350,9 +354,9 @@ static Obj AVLIndexLookup_C( Obj self, Obj t, Obj i )
         ErrorQuit( "Usage: AVLIndexLookup(avltree, integer)", 0L, 0L );
         return 0L;
     }
-    Int p = AVLIndex(t,INT_INTOBJ(i));
+    p = AVLIndex(t,INT_INTOBJ(i));
     if (p == 0) return Fail;
-    Obj vals = AVLValues(t);
+    vals = AVLValues(t);
     p /= 4;
     if (vals == Fail || !ISB_LIST(vals,p))
         return True;
@@ -473,7 +477,7 @@ static inline void AVLRebalance( Obj tree, Int q, Int *newroot, int *shrink )
   *newroot = p;
 }
 
-Obj static AVLRebalance_C( Obj self, Obj tree, Obj q )
+static Obj AVLRebalance_C( Obj self, Obj tree, Obj q )
 {
     Int newroot = 0;
     int shrink;
@@ -485,7 +489,7 @@ Obj static AVLRebalance_C( Obj self, Obj tree, Obj q )
     return tmp;
 }
 
-Obj static AVLAdd_C( Obj self, Obj tree, Obj data, Obj value )
+static Obj AVLAdd_C( Obj self, Obj tree, Obj data, Obj value )
 {
 /* Parameters: tree, data, value
     tree is an AVL tree
@@ -508,6 +512,7 @@ Obj static AVLAdd_C( Obj self, Obj tree, Obj data, Obj value )
   Int c;
   Int l;
   Int i;
+  int shrink;
 
   if (TNUM_OBJ(tree) != T_POSOBJ || TYPE_POSOBJ(tree) != AVLTreeTypeMutable) {
       ErrorQuit( "Usage: AVLAdd(avltree, object, object)", 0L, 0L );
@@ -605,7 +610,7 @@ Obj static AVLAdd_C( Obj self, Obj tree, Obj data, Obj value )
   
   /* now at last we do have to rebalance at nodes[q] because the tree has
      gotten out of balance: */
-  int shrink;   /* not used */
+  shrink;   /* not used */
   AVLRebalance(tree,nodes[q],&p,&shrink);
   
   /* finishing touch: link new root of subtree (p) to t: */
@@ -620,7 +625,7 @@ Obj static AVLAdd_C( Obj self, Obj tree, Obj data, Obj value )
   return True;
 }
 
-Obj static AVLIndexAdd_C( Obj self, Obj tree, Obj data, Obj value, Obj ind )
+static Obj AVLIndexAdd_C( Obj self, Obj tree, Obj data, Obj value, Obj ind )
 {
 /* Parameters: tree, data, value
     tree is an AVL tree
@@ -642,6 +647,7 @@ Obj static AVLIndexAdd_C( Obj self, Obj tree, Obj data, Obj value, Obj ind )
   Int index;
   Int i;
   Int offset;
+  int shrink;
 
   if (TNUM_OBJ(tree) != T_POSOBJ || TYPE_POSOBJ(tree) != AVLTreeTypeMutable) {
       ErrorQuit( "Usage: AVLAdd(avltree, object, object)", 0L, 0L );
@@ -739,7 +745,7 @@ Obj static AVLIndexAdd_C( Obj self, Obj tree, Obj data, Obj value, Obj ind )
   
   /* now at last we do have to rebalance at nodes[q] because the tree has
      gotten out of balance: */
-  int shrink;   /* not used */
+  shrink;   /* not used */
   AVLRebalance(tree,nodes[q],&p,&shrink);
   
   /* finishing touch: link new root of subtree (p) to t: */
@@ -928,7 +934,7 @@ static Obj AVLDelete_C( Obj self, Obj tree, Obj data)
   return old;
 }
  
-Obj static AVLIndexDelete_C( Obj self, Obj tree, Obj index)
+static Obj AVLIndexDelete_C( Obj self, Obj tree, Obj index)
   /* Parameters: tree, index
       tree is an AVL tree
       index is the index of the element to be deleted, must be between 1 and
@@ -1392,10 +1398,13 @@ static Obj GenericHashFunc_C(Obj self, Obj x, Obj data)
 # include <endian.h>
 #endif
 
+// xxx
+#if 0
 #if !defined(__CYGWIN__)
 typedef u_int32_t uint32_t;
 typedef u_int16_t uint16_t;
 typedef u_int8_t uint8_t;
+#endif
 #endif
 
 
@@ -1603,9 +1612,9 @@ uint32_t hashword(register uint32_t *k,
   /*------------------------------------------- handle the last 3 uint32_t's */
   switch(length)                     /* all the case statements fall through */
   { 
-  case 3 : c+=k[2];
-  case 2 : b+=k[1];
-  case 1 : a+=k[0];
+  case 3: c+=k[2];
+  case 2: b+=k[1];
+  case 1: a+=k[0];
     final(a,b,c);
   case 0:     /* case 0: nothing left to add */
     break;
@@ -1670,16 +1679,16 @@ uint32_t hashlittle( register void *key, register size_t length,
     case 12: c+=k[2]; b+=k[1]; a+=k[0]; break;
     case 11: c+=k[2]&0xffffff; b+=k[1]; a+=k[0]; break;
     case 10: c+=k[2]&0xffff; b+=k[1]; a+=k[0]; break;
-    case 9 : c+=k[2]&0xff; b+=k[1]; a+=k[0]; break;
-    case 8 : b+=k[1]; a+=k[0]; break;
-    case 7 : b+=k[1]&0xffffff; a+=k[0]; break;
-    case 6 : b+=k[1]&0xffff; a+=k[0]; break;
-    case 5 : b+=k[1]&0xff; a+=k[0]; break;
-    case 4 : a+=k[0]; break;
-    case 3 : a+=k[0]&0xffffff; break;
-    case 2 : a+=k[0]&0xffff; break;
-    case 1 : a+=k[0]&0xff; break;
-    case 0 : return c;              /* zero length strings require no mixing */
+    case 9:  c+=k[2]&0xff; b+=k[1]; a+=k[0]; break;
+    case 8:  b+=k[1]; a+=k[0]; break;
+    case 7:  b+=k[1]&0xffffff; a+=k[0]; break;
+    case 6:  b+=k[1]&0xffff; a+=k[0]; break;
+    case 5:  b+=k[1]&0xff; a+=k[0]; break;
+    case 4:  a+=k[0]; break;
+    case 3:  a+=k[0]&0xffffff; break;
+    case 2:  a+=k[0]&0xffff; break;
+    case 1:  a+=k[0]&0xff; break;
+    case 0:  return c;              /* zero length strings require no mixing */
     }
 
   } else if (HASH_LITTLE_ENDIAN && !((((uint8_t *)key)-(uint8_t *)0) & 0x1)) {
@@ -1708,23 +1717,23 @@ uint32_t hashlittle( register void *key, register size_t length,
              b+=k[2]+(((uint32_t)k[3])<<16);
              a+=k[0]+(((uint32_t)k[1])<<16);
              break;
-    case 9 : c+=k[4]&0xff;                /* fall through */
-    case 8 : b+=k[2]+(((uint32_t)k[3])<<16);
+    case 9:  c+=k[4]&0xff;                /* fall through */
+    case 8:  b+=k[2]+(((uint32_t)k[3])<<16);
              a+=k[0]+(((uint32_t)k[1])<<16);
              break;
-    case 7 : b+=((uint32_t)(k[3]&0xff))<<16;/* fall through */
-    case 6 : b+=k[2];
+    case 7:  b+=((uint32_t)(k[3]&0xff))<<16;/* fall through */
+    case 6:  b+=k[2];
              a+=k[0]+(((uint32_t)k[1])<<16);
              break;
-    case 5 : b+=k[2]&0xff;                /* fall through */
-    case 4 : a+=k[0]+(((uint32_t)k[1])<<16);
+    case 5:  b+=k[2]&0xff;                /* fall through */
+    case 4:  a+=k[0]+(((uint32_t)k[1])<<16);
              break;
-    case 3 : a+=((uint32_t)(k[1]&0xff))<<16;/* fall through */
-    case 2 : a+=k[0];
+    case 3:  a+=((uint32_t)(k[1]&0xff))<<16;/* fall through */
+    case 2:  a+=k[0];
              break;
-    case 1 : a+=k[0]&0xff;
+    case 1:  a+=k[0]&0xff;
              break;
-    case 0 : return c;                     /* zero length requires no mixing */
+    case 0:  return c;                     /* zero length requires no mixing */
     }
 
   } else {                        /* need to read the key one byte at a time */
@@ -1756,17 +1765,17 @@ uint32_t hashlittle( register void *key, register size_t length,
     case 12: c+=((uint32_t)k[11])<<24;
     case 11: c+=((uint32_t)k[10])<<16;
     case 10: c+=((uint32_t)k[9])<<8;
-    case 9 : c+=k[8];
-    case 8 : b+=((uint32_t)k[7])<<24;
-    case 7 : b+=((uint32_t)k[6])<<16;
-    case 6 : b+=((uint32_t)k[5])<<8;
-    case 5 : b+=k[4];
-    case 4 : a+=((uint32_t)k[3])<<24;
-    case 3 : a+=((uint32_t)k[2])<<16;
-    case 2 : a+=((uint32_t)k[1])<<8;
-    case 1 : a+=k[0];
+    case 9:  c+=k[8];
+    case 8:  b+=((uint32_t)k[7])<<24;
+    case 7:  b+=((uint32_t)k[6])<<16;
+    case 6:  b+=((uint32_t)k[5])<<8;
+    case 5:  b+=k[4];
+    case 4:  a+=((uint32_t)k[3])<<24;
+    case 3:  a+=((uint32_t)k[2])<<16;
+    case 2:  a+=((uint32_t)k[1])<<8;
+    case 1:  a+=k[0];
              break;
-    case 0 : return c;
+    case 0:  return c;
     }
   }
 
@@ -1811,16 +1820,16 @@ uint32_t hashbig(register void *key,
     case 12: c+=k[2]; b+=k[1]; a+=k[0]; break;
     case 11: c+=k[2]<<8; b+=k[1]; a+=k[0]; break;
     case 10: c+=k[2]<<16; b+=k[1]; a+=k[0]; break;
-    case 9 : c+=k[2]<<24; b+=k[1]; a+=k[0]; break;
-    case 8 : b+=k[1]; a+=k[0]; break;
-    case 7 : b+=k[1]<<8; a+=k[0]; break;
-    case 6 : b+=k[1]<<16; a+=k[0]; break;
-    case 5 : b+=k[1]<<24; a+=k[0]; break;
-    case 4 : a+=k[0]; break;
-    case 3 : a+=k[0]<<8; break;
-    case 2 : a+=k[0]<<16; break;
-    case 1 : a+=k[0]<<24; break;
-    case 0 : return c;              /* zero length strings require no mixing */
+    case 9:  c+=k[2]<<24; b+=k[1]; a+=k[0]; break;
+    case 8:  b+=k[1]; a+=k[0]; break;
+    case 7:  b+=k[1]<<8; a+=k[0]; break;
+    case 6:  b+=k[1]<<16; a+=k[0]; break;
+    case 5:  b+=k[1]<<24; a+=k[0]; break;
+    case 4:  a+=k[0]; break;
+    case 3:  a+=k[0]<<8; break;
+    case 2:  a+=k[0]<<16; break;
+    case 1:  a+=k[0]<<24; break;
+    case 0:  return c;              /* zero length strings require no mixing */
     }
 
   } else {                        /* need to read the key one byte at a time */
@@ -1852,17 +1861,17 @@ uint32_t hashbig(register void *key,
     case 12: c+=((uint32_t)k[11])<<24;
     case 11: c+=((uint32_t)k[10])<<16;
     case 10: c+=((uint32_t)k[9])<<8;
-    case 9 : c+=k[8];
-    case 8 : b+=((uint32_t)k[7])<<24;
-    case 7 : b+=((uint32_t)k[6])<<16;
-    case 6 : b+=((uint32_t)k[5])<<8;
-    case 5 : b+=k[4];
-    case 4 : a+=((uint32_t)k[3])<<24;
-    case 3 : a+=((uint32_t)k[2])<<16;
-    case 2 : a+=((uint32_t)k[1])<<8;
-    case 1 : a+=k[0];
+    case 9:  c+=k[8];
+    case 8:  b+=((uint32_t)k[7])<<24;
+    case 7:  b+=((uint32_t)k[6])<<16;
+    case 6:  b+=((uint32_t)k[5])<<8;
+    case 5:  b+=k[4];
+    case 4:  a+=((uint32_t)k[3])<<24;
+    case 3:  a+=((uint32_t)k[2])<<16;
+    case 2:  a+=((uint32_t)k[1])<<8;
+    case 1:  a+=k[0];
              break;
-    case 0 : return c;
+    case 0:  return c;
     }
   }
 
