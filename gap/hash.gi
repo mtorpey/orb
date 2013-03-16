@@ -787,6 +787,15 @@ function(t,data)
   fi;
 end );
 
+InstallGlobalFunction( ORB_HashFunctionForPartialPerms,
+function(t,data)
+  if IsPPerm2Rep(t) then 
+    return HashKeyBag(t,255,2,2*DegreeOfPartialPerm(t)) mod data + 1;
+  else
+    return HashKeyBag(t,255,4,4*DegreeOfPartialPerm(t)) mod data + 1; 
+  fi;
+end );
+
 InstallGlobalFunction( MakeHashFunctionForPlainFlatList,
   function( len )
     if not(CompareVersionNumbers(GAPInfo.Version,"4.5")) and
@@ -808,6 +817,12 @@ InstallMethod( ChooseHashFunction, "for transformations",
   [IsTransformation, IsInt],
   function(t,hashlen)
     return rec( func := ORB_HashFunctionForTransformations, data := hashlen );
+  end );
+
+InstallMethod( ChooseHashFunction, "for partial perms",
+  [IsPartialPerm, IsInt],
+  function(t,hashlen)
+    return rec( func := ORB_HashFunctionForPartialPerms, data := hashlen );
   end );
 
 InstallGlobalFunction( ORB_HashFunctionForIntList,
