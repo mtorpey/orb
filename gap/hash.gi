@@ -463,6 +463,13 @@ InstallMethod( HTValue, "for a hash table and an object",
     return fail;
 end );
 
+if IsBound(HTValue_Hash_C) then
+    InstallMethod( HTValue, "for a hash table and an object (C version)",
+      [ IsHashTabRep, IsObject ], 1,
+      HTValue_Hash_C );
+fi;
+
+
 InstallMethod( HTDelete, "for a hash table and an object",
   [ IsHashTabRep, IsObject ],
   function( ht, x )
@@ -781,7 +788,8 @@ fi;
 InstallGlobalFunction( ORB_HashFunctionForTransformations,
 function(t,data)
   if IsTrans2Rep(t) then 
-    return HashKeyBag(t,255,0,2*DegreeOfTransformation(t)) mod data + 1;
+    #return HachageTransitions2(t, data);
+    return HashKeyBag(t,255,0,2*DegreeOfTransformation(t)) mod data + 1; 
   else
     return HashKeyBag(t,255,0,4*DegreeOfTransformation(t)) mod data + 1; 
   fi;

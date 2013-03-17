@@ -1209,6 +1209,52 @@ static Obj HTAdd_TreeHash_C(Obj self, Obj ht, Obj x, Obj v)
         return Fail;
 }
 
+static Obj HTValue_Hash_C(Obj self, Obj ht, Obj x){
+  Obj els, vals, hfd, t, c;
+  Int h, len, a, b, g;
+
+  initRNams();
+  //increment accesses entry
+  t = ElmPRec(ht,RNam_accesses);
+  t = INTOBJ_INT(INT_INTOBJ(t)+1);
+  AssPRec(ht,RNam_accesses,t);
+  
+  //compute hash value
+  hfd = ElmPRec(ht,RNam_hfd);
+  t = ElmPRec(ht,RNam_hf);
+  h = INT_INTOBJ(CALL_2ARGS(t,x,hfd));
+  
+  els = ElmPRec(ht,RNam_els);
+  vals = ElmPRec(ht,RNam_vals);
+  len = INT_INTOBJ(ElmPRec(ht, RNam_len));
+  g=0;
+  while(ELM_PLIST(els, h)!=0L){
+    if (EQ(x,ELM_PLIST(els,h))){
+      if(ELM_PLIST(vals, h)!=0L){
+        return ELM_PLIST(vals, h);
+      } else {
+        return True;
+      }
+    }
+    
+    if(g==0){
+      g=h; a=len;
+      while(a!=0){ b=a; a=g%a; g=b;}
+      if(g==1){
+        g=h;
+      }else{
+        g=1;
+      }
+    }
+    c=ElmPRec(ht, RNam_collisions);
+    c=INTOBJ_INT(INT_INTOBJ(c)+1);
+    AssPRec(ht, RNam_collisions, c);
+    h+=g;
+    if(h>len) h=h-len;
+  }
+  return Fail;
+}
+ 
 static Obj HTValue_TreeHash_C(Obj self, Obj ht, Obj x)
 {
     Obj els;
@@ -2333,6 +2379,10 @@ static StructGVarFunc GVarFuncs [] = {
   { "HTValue_TreeHash_C", 2, "treehash, x",
     HTValue_TreeHash_C,
     "orb.c:HTValue_TreeHash_C" },
+
+  { "HTValue_Hash_C", 2, "hash, x",
+    HTValue_Hash_C,
+    "orb.c:HTValue_Hash_C" },
 
   { "HTDelete_TreeHash_C", 2, "treehash, x",
     HTDelete_TreeHash_C,
