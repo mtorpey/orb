@@ -1,59 +1,16 @@
 #############################################################################
 ##  
 ##  PackageInfo.g for the package `orb'                       
-##                                                            Juergen Mueller
-##                                                            Max Neunhoeffer
-##                                                               Felix Noeske
 ##
-
-##  With a new release of the package at least the entries .Version, .Date and
-##  .ArchiveURL must be updated.
 
 SetPackageInfo( rec(
 
-##  This is case sensitive, use your preferred spelling.
-#
 PackageName := "orb",
+Subtitle := "Methods to enumerate Orbits",
+Version := "5.1",
+Date := "16/03/2015", # dd/mm/yyyy format
 
-Subtitle := "orb - Methods to enumerate Orbits",
-
-Version := "5.0",
-##  Please adjust also the VERSION file in the package directory when
-##  changing this.
-
-##  Release date of the current version in dd/mm/yyyy format.
-# 
-Date := "30/05/2012",
-
-ArchiveURL := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/orb/orb-4.5",
-
-ArchiveFormats := ".tar.gz",
-
-##  If not all of the archive formats mentioned above are provided, these 
-##  can be produced at the GAP side. Therefore it is necessary to know which
-##  files of the package distribution are text files which should be unpacked
-##  with operating system specific line breaks. There are the following 
-##  possibilities to specify the text files:
-##  
-##    - specify below a component 'TextFiles' which is a list of names of the 
-##      text files, relative to the package root directory (e.g., "lib/bla.g")
-##    - specify below a component 'BinaryFiles' as list of names, then all other
-##      files are taken as text files.
-##    - if no 'TextFiles' or 'BinaryFiles' are given and a .zoo archive is
-##      provided, then the files in that archive with a "!TEXT!" comment are
-##      taken as text files
-##    - otherwise: exactly the files with names matching the regular expression
-##      ".*\(\.txt\|\.gi\|\.gd\|\.g\|\.c\|\.h\|\.htm\|\.html\|\.xml\|\.tex\|\.six\|\.bib\|\.tst\|README.*\|INSTALL.*\|Makefile\)"
-##      are taken as text files
-##  
-##  (Remark: Just providing a .tar.gz file will often result in useful
-##  archives)
-##  
-##  These entries are *optional*.
-#TextFiles := ["init.g", ......],
-#BinaryFiles := ["doc/manual.dvi", ......],
-
-
+##  Information about authors and maintainers.
 Persons := [
   rec( 
     LastName      := "Mueller",
@@ -72,20 +29,18 @@ Persons := [
     Institution   := "RWTH Aachen"
   ),
   rec( 
-    LastName      := "Neunhoeffer",
+    LastName      := "Neunhöffer",
     FirstNames    := "Max",
     IsAuthor      := true,
-    IsMaintainer  := true,
-    Email         := "neunhoef@mcs.st-and.ac.uk",
+    IsMaintainer  := false,
+    Email         := "max@9hoeffer.de",
     WWWHome       := "http://www-groups.mcs.st-and.ac.uk/~neunhoef",
     PostalAddress := Concatenation( [
-                       "School of Mathematics and Statistics\n",
-                       "Mathematical Institute\n",
-                       "North Haugh\n",
-                       "St Andrews, Fife KY16 9SS\n",
-                       "Scotland, UK" ] ),
-    Place         := "St Andrews",
-    Institution   := "University of St Andrews"
+                       "Gustav-Freytag-Straße 40\n",
+                       "50354 Hürth\n",
+                       "Germany" ] ),
+    #Place         := "St Andrews",
+    #Institution   := "University of St Andrews"
   ),
   rec( 
     LastName      := "Noeske",
@@ -103,7 +58,23 @@ Persons := [
     Place         := "Aachen",
     Institution   := "RWTH Aachen"
   ),
-  
+  rec(
+    LastName      := "Horn",
+    FirstNames    := "Max",
+    IsAuthor      := false,
+    IsMaintainer  := true,
+    Email         := "max.horn@math.uni-giessen.de",
+    WWWHome       := "http://www.quendi.de/math",
+    PostalAddress := Concatenation(
+                       "AG Algebra\n",
+                       "Mathematisches Institut\n",
+                       "Justus-Liebig-Universität Gießen\n",
+                       "Arndtstraße 2\n",
+                       "35392 Gießen\n",
+                       "Germany" ),
+    Place         := "Gießen",
+    Institution   := "Justus-Liebig-Universität Gießen"
+  ),
 ],
 
 ##  Status information. Currently the following cases are recognized:
@@ -125,10 +96,13 @@ Status := "deposited",
 # AcceptDate := "08/1999",
 #AcceptDate := "",
 
-README_URL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/orb/README.orb",
-PackageInfoURL := 
-  "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/orb/PackageInfo.g",
+PackageWWWHome := "http://gap-system.github.io/orb/",
+README_URL     := Concatenation(~.PackageWWWHome, "README"),
+PackageInfoURL := Concatenation(~.PackageWWWHome, "PackageInfo.g"),
+ArchiveURL     := Concatenation("https://github.com/gap-system/orb/",
+                                "releases/download/v", ~.Version,
+                                "/orb-", ~.Version),
+ArchiveFormats := ".tar.gz .tar.bz2",
 
 ##  Here you  must provide a short abstract explaining the package content 
 ##  in HTML format (used on the package overview Web page) and an URL 
@@ -137,14 +111,10 @@ PackageInfoURL :=
 ##  Please, use '<span class="pkgname">GAP</span>' and
 ##  '<span class="pkgname">MyPKG</span>' for specifing package names.
 ##  
-# AbstractHTML := "This package provides  a collection of functions for \
-# computing the Smith normal form of integer matrices and some related \
-# utilities.",
 AbstractHTML := 
   "The <span class=\"pkgname\">orb</span> package is about enumerating \
 orbits in various ways.",
 #
-PackageWWWHome := "http://www-groups.mcs.st-and.ac.uk/~neunhoef/Computer/Software/Gap/orb.html",
 
 PackageDoc := rec(
   BookName  := "orb",
@@ -152,33 +122,17 @@ PackageDoc := rec(
   HTMLStart := "doc/chap0.html",
   PDFFile   := "doc/manual.pdf",
   SixFile   := "doc/manual.six",
-  LongTitle := "orb - Methods to enumerate orbits",
-  Autoload  := true
+  LongTitle := "Methods to enumerate orbits",
 ),
-
 
 Dependencies := rec(
   GAP := ">=4.4.12",
   NeededOtherPackages := [["GAPDoc", ">= 1.2"]],
   SuggestedOtherPackages := [["IO",">= 3.3"]],
   ExternalConditions := []
-                      
 ),
 
-##  Provide a test function for the availability of this package.
-##  For packages which will not fully work, use 'Info(InfoWarning, 1,
-##  ".....")' statements. For packages containing nothing but GAP code,
-##  just say 'ReturnTrue' here.
-##  With the new package loading mechanism (GAP >=4.4)  the availability
-##  tests of other packages, as given under .Dependencies above, will be 
-##  done automatically and need not be included in this function.
 AvailabilityTest := ReturnTrue,
-
-##  Suggest here if the package should be *automatically loaded* when GAP is 
-##  started.  This should usually be 'false'. Say 'true' only if your package 
-##  provides some improvements of the GAP library which are likely to enhance 
-##  the overall system performance for many users.
-Autoload := false,
 
 ##  *Optional*, but recommended: path relative to package root to a file which 
 ##  contains as many tests of the package functionality as sensible.
@@ -187,7 +141,29 @@ Autoload := false,
 ##  *Optional*: Here you can list some keyword related to the topic 
 ##  of the package.
 Keywords := ["Orbit huge", "OrbitBySuborbit", "hash tables", 
-             "searching in groups"]
+             "searching in groups"],
+
+AutoDoc := rec(
+    TitlePage := rec(
+        Copyright := Concatenation(
+                    "&copyright; 2005-2014 by Jürgen Müller, Max Neunhöffer and Felix Noeske<P/>\n",
+                    "\n",
+                    "This program is free software: you can redistribute it and/or modify\n",
+                    "it under the terms of the GNU General Public License as published by\n",
+                    "the Free Software Foundation, either version 3 of the License, or\n",
+                    "(at your option) any later version.\n",
+                    "\n",
+                    "This program is distributed in the hope that it will be useful,\n",
+                    "but WITHOUT ANY WARRANTY; without even the implied warranty of\n",
+                    "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n",
+                    "GNU General Public License for more details.\n",
+                    "\n",
+                    "You should have received a copy of the GNU General Public License\n",
+                    "along with this program.  If not, see\n",
+                    "<URL><Link>http://www.gnu.org/licenses/</Link></URL>.\n"
+                ),
+    )
+),
 
 ));
 
