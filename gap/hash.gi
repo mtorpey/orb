@@ -595,7 +595,9 @@ else
     GenericHashFunc := function(x,data)
       return JENKINS_HASH_IN_ORB(x, data[2], data[3], data[4] );
     end;
-    AddSet( GLOBAL_FUNCTION_NAMES, "JENKINS_HASH_IN_ORB" );
+    atomic readwrite GLOBAL_FUNCTION_NAMES do
+        AddSet( GLOBAL_FUNCTION_NAMES, "JENKINS_HASH_IN_ORB" );
+    od;
 fi;
 
 # First a few hash functions:
