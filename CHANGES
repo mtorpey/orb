@@ -1,7 +1,20 @@
 This file describes changes in the orb package.
 
-X.Y (YYYY-MM-DD)
-  - ...
+4.x.y (YYYY-MM-DD)
+  - Show an error when the user tries to compute orbits of objects for
+    which no ChooseHashFunction method is available. Previously, it would
+    fall back to a "trivial" hash function, which lead to worst-case
+    performance.
+  - Require GAP >= 4.6
+  - Remove Jenkins hash in favor of the Murmur hash built into GAP
+
+4.7.3 (2014-11-08)
+  - Tweak the build system to avoid potential issues when the source
+    code gets repackages by third parties (e.g. by the GAP team, when
+    creating their big package archives)
+  - Fix a missing variable initialization, which could cause Enumerate
+    (and hence anything using it, such as FindShortGeneratorsOfSubgroup)
+    to run into an error.
 
 4.7.2 (2014-09-24)
   - Fix error in Memory() method for orbit-by-suborbit setup objects.

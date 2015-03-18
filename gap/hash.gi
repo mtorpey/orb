@@ -172,7 +172,7 @@ InstallMethod( HTCreate, "for an object",
 InstallMethod( HTCreate, "for an object and an options record",
   [ IsObject, IsRecord ],
   function( x, opt )
-    local ht,ty,hfun;
+    local ht,ty,hfun,cangrow;
     ht := ShallowCopy(opt);
     if IsBound(ht.hashlen) then
         ty := HashTabType;
@@ -190,6 +190,21 @@ InstallMethod( HTCreate, "for an object and an options record",
         ty := TreeHashTabType;
         ht.len := 100003;
     fi;
+
+    # Prevent the table from growing too large.
+    cangrow := true;
+    if GAPInfo.BytesPerVariable = 4 then
+        if ht.len > 2^28-2 then
+            ht.len := 2^28-57; # largest prime below 2^28
+            cangrow := false;
+        fi;
+    else
+        if ht.len > 2^60-2 then
+            ht.len := 2^60-93; # largest prime below 2^60
+            cangrow := false;
+        fi;
+    fi;
+
     ht.els := EmptyPlist(ht.len+1);
     ht.els[ht.len+1] := fail;   # To create proper length!
     ht.vals := [];
@@ -197,7 +212,7 @@ InstallMethod( HTCreate, "for an object and an options record",
     if IsBound(ht.forflatplainlists) then
         ht.hf := ORB_HashFunctionForPlainFlatList;
         ht.hfd := ht.len;
-        ht.cangrow := true;
+        ht.cangrow := cangrow;
     elif not(IsBound(ht.hf) and IsBound(ht.hfd)) then
         hfun := ChooseHashFunction(x,ht.len);
         if hfun = fail then
@@ -206,9 +221,9 @@ InstallMethod( HTCreate, "for an object and an options record",
         fi;
         ht.hf := hfun.func;
         ht.hfd := hfun.data;
-        ht.cangrow := true;
+        ht.cangrow := cangrow;
     else
-        ht.cangrow := IsBound(ht.hfbig) and IsBound(ht.hfdbig);
+        ht.cangrow := cangrow and IsBound(ht.hfbig) and IsBound(ht.hfdbig);
     fi;
     ht.collisions := 0;
     ht.accesses := 0;
@@ -614,21 +629,18 @@ end );
 
 InstallGlobalFunction( ORB_HashFunctionForGF2Vectors,
 function(v,data)
-  return HASHKEY_BAG(v,101,2*GAPInfo.BytesPerVariable,data[2]) mod data[1] + 1;
+  return HashKeyBag(v,101,2*GAPInfo.BytesPerVariable,data[2]) mod data[1] + 1;
 end );
 
 InstallGlobalFunction( ORB_HashFunctionFor8BitVectors,
 function(v,data)
-  return HASHKEY_BAG(v,101,3*GAPInfo.BytesPerVariable,data[2]) mod data[1] + 1;
+  return HashKeyBag(v,101,3*GAPInfo.BytesPerVariable,data[2]) mod data[1] + 1;
 end );
-
-InstallGlobalFunction( ORB_HashFunctionReturn1,
-  function(v,data) return 1; end );
 
 InstallMethod( ChooseHashFunction, "failure method if all fails",
   [IsObject,IsInt],
   function(p,hashlen)
-    return rec( func := ORB_HashFunctionReturn1, data := fail );
+    Error("Could not guess a suitable hash function");
   end );
 
 # Now the choosing methods for compressed vectors:
@@ -644,9 +656,6 @@ InstallMethod( ChooseHashFunction, "for compressed gf2 vectors",
     if bytelen <= 8 then
         return rec( func := ORB_HashFunctionForShortGF2Vectors,
                     data := [hashlen] );
-    elif IsFunction(GenericHashFunc) then
-        return rec( func := GenericHashFunc,
-                    data := [101,2*GAPInfo.BytesPerVariable,bytelen,hashlen] );
     else
         return rec( func := ORB_HashFunctionForGF2Vectors,
                     data := [hashlen,bytelen] );
@@ -672,9 +681,6 @@ InstallMethod( ChooseHashFunction, "for compressed 8bit vectors",
     if bytelen <= 8 then
         return rec( func := ORB_HashFunctionForShort8BitVectors,
                     data := [hashlen,q] );
-    elif IsFunction(GenericHashFunc) then
-        return rec( func := GenericHashFunc,
-                    data := [101,3*GAPInfo.BytesPerVariable,bytelen,hashlen] );
     else
         return rec( func := ORB_HashFunctionFor8BitVectors,
                     data := [hashlen,bytelen] );
@@ -754,31 +760,11 @@ function(p,data)
    return HashKeyBag(p,255,0,2*l) mod data + 1;
 end );
 
-if IsBound(HashKeyBag) then
-    InstallGlobalFunction( ORB_HashFunctionForPlainFlatList,
-      function( x, data )
-        return (HashKeyBag( x, 0, 0, 
-                            GAPInfo.BytesPerVariable*(Length(x)+1)) mod data)+1;
-      end );
-elif JENKINS_HASH_IN_ORB <> fail then
-    InstallGlobalFunction( ORB_HashFunctionForPlainFlatList,
-      function( x, data )
-        return JENKINS_HASH_IN_ORB(x, 0,
-                                   GAPInfo.BytesPerVariable*(Length(x)+1),data);
-      end );
-else
-    InstallGlobalFunction( ORB_HashFunctionForPlainFlatList,
-      function(v,data)
-        local i,res;
-        res := 0;
-        for i in v do
-            if IsInt(i) then
-                res := (res * 101 + i) mod data;
-            fi;
-        od;
-        return res+1;
-      end );
-fi;
+InstallGlobalFunction( ORB_HashFunctionForPlainFlatList,
+  function( x, data )
+    return (HashKeyBag( x, 0, 0, 
+                        GAPInfo.BytesPerVariable*(Length(x)+1)) mod data)+1;
+  end );
 
 if IsBound(HASH_FUNC_FOR_TRANS) then
   InstallGlobalFunction( ORB_HashFunctionForTransformations, HASH_FUNC_FOR_TRANS);
@@ -805,10 +791,6 @@ fi;
 
 InstallGlobalFunction( MakeHashFunctionForPlainFlatList,
   function( len )
-    if not IsBound(HashKeyBag) and JENKINS_HASH_IN_ORB = fail then
-        Error("Please compile the C-part, containing the Jenkinks Hash Func");
-        return fail;
-    fi;
     return rec( func := ORB_HashFunctionForPlainFlatList,
                 data := len );
   end );
@@ -822,7 +804,7 @@ InstallMethod( ChooseHashFunction, "for permutations",
 InstallMethod( ChooseHashFunction, "for transformations",
   [IsTransformation, IsInt],
   function(t,hashlen)
-    return rec(func := ORB_HashFunctionForTransformations, data:=hashlen);
+    return rec( func := ORB_HashFunctionForTransformations, data := hashlen );
   end );
 
 InstallGlobalFunction( ORB_HashFunctionForIntList,

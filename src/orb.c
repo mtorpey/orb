@@ -2113,14 +2113,6 @@ static StructGVarFunc GVarFuncs [] = {
     HTUpdate_TreeHash_C,
     "orb.c:HTUpdate_TreeHash_C" },
 
-  { "GenericHashFunc_C", 2, "x, data",
-    GenericHashFunc_C,
-    "orb.c:GenericHashFunc_C" }, 
-
-  { "JENKINS_HASH_IN_ORB", 4, "x, offset, bytelen, hashlen",
-    FuncJenkinsHashInOrb, 
-    "pkg/orb/src/orb.c:JENKINS_HASH_IN_ORB" },
-
   { "MappingPermSetSet_C", 2, "src, dst",
     FuncMappingPermSetSet,
     "pkg/orb/src/orb.c:FuncMappingPermSetSet_C" },

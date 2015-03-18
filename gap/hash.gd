@@ -48,7 +48,6 @@ DeclareOperation( "HTGrow", [ IsHashTab, IsObject ] );
 
 DeclareOperation( "ChooseHashFunction", [IsObject, IsInt] );
 
-DeclareGlobalFunction( "ORB_HashFunctionReturn1" );
 DeclareGlobalFunction( "ORB_HashFunctionForShortGF2Vectors" );
 DeclareGlobalFunction( "ORB_HashFunctionForShort8BitVectors" );
 DeclareGlobalFunction( "ORB_HashFunctionForGF2Vectors" );
