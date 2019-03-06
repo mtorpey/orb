@@ -1,5 +1,8 @@
 # orb -- GAP package providing methods to enumerate orbits
 
+Michael rules!
+(P.S. this is just a demonstration for a git teaching session)
+
 ## Installation
 
 To get the newest version of this GAP 4 package download from
